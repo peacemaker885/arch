@@ -181,5 +181,5 @@ arch-chroot /mnt systemctl enable dhcpcd
 # arch-chroot /mnt os-prober
 # arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
-echo "$user:$password" | chpasswd --root /mnt
-echo "root:$password" | chpasswd --root /mnt
+echo "$user:$password" | arch-chroot /mnt chpasswd
+echo "root:$password" | arch-chroot /mnt chpasswd
