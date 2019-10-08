@@ -171,7 +171,7 @@ then
 fi
 
 # Install some stuff. Note this installs the LTS kernel
-pacstrap /mnt cryptsetup device-mapper dhcpcd diffutils e2fsprogs inetutils less logrotate man-db man-pages mdadm netctl perl texinfo usbutils vi which wireless_tools wpa_supplicant dhcp iw dialog  openssh exfat-utils zip unzip powertop git polkit
+pacstrap /mnt cryptsetup device-mapper dhcpcd diffutils e2fsprogs inetutils jfsutils less linux linux-firmware logrotate lvm2 man-db man-pages mdadm nano netctl perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprog wireless_tools wpa_supplicant dhcp iw dialog  openssh exfat-utils zip unzip powertop git polkit
 arch-chroot /mnt systemctl enable dhcpcd
 
 # If Dual booting with Windows 10 under MBR
