@@ -93,6 +93,7 @@ if [ -d /sys/firmware/efi ]; then
  mount "${part_boot}" /mnt/boot
  
  # Install basic system
+ pacman -S archlinux-keyring
  pacstrap /mnt base linux-lts grub sudo
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
@@ -141,6 +142,7 @@ else
  mount "${part_boot}" /mnt/boot
 
  # Install packages
+ pacman -S archlinux-keyring
  pacstrap /mnt base linux-lts grub sudo
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
  echo "${hostname}" > /mnt/etc/hostname
