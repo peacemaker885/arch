@@ -48,6 +48,7 @@ clear
 MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on"
 
 pacman -Sy --noconfirm pacman-contrib
+pacman -S archlinux-keyring
 
 echo "Updating mirror list"
 curl -s "$MIRRORLIST_URL" | \
@@ -93,7 +94,6 @@ if [ -d /sys/firmware/efi ]; then
  mount "${part_boot}" /mnt/boot
  
  # Install basic system
- pacman -S archlinux-keyring
  pacstrap /mnt base linux-lts grub sudo
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
@@ -142,7 +142,6 @@ else
  mount "${part_boot}" /mnt/boot
 
  # Install packages
- pacman -S archlinux-keyring
  pacstrap /mnt base linux-lts grub sudo
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
  echo "${hostname}" > /mnt/etc/hostname
