@@ -48,7 +48,6 @@ clear
 MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on"
 
 pacman -Sy --noconfirm pacman-contrib
-pacman -S archlinux-keyring
 
 echo "Updating mirror list"
 curl -s "$MIRRORLIST_URL" | \
@@ -60,6 +59,7 @@ curl -s "$MIRRORLIST_URL" | \
 #exec 2> >(tee "stderr.log")
 
 timedatectl set-ntp true
+pacman -S archlinux-keyring
 
 ### Setup the disk and partitions ###
 echo Partitioning Disk
