@@ -59,7 +59,6 @@ curl -s "$MIRRORLIST_URL" | \
 #exec 2> >(tee "stderr.log")
 
 timedatectl set-ntp true
-pacman -S archlinux-keyring
 
 ### Setup the disk and partitions ###
 echo Partitioning Disk
@@ -94,7 +93,7 @@ if [ -d /sys/firmware/efi ]; then
  mount "${part_boot}" /mnt/boot
  
  # Install basic system
- pacstrap /mnt base linux-lts grub sudo
+ pacstrap /mnt archlinux-keyrng base linux-lts grub sudo
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
  # Install bootloader
@@ -142,7 +141,7 @@ else
  mount "${part_boot}" /mnt/boot
 
  # Install packages
- pacstrap /mnt base linux-lts grub sudo
+ pacstrap /mnt archlinux-keyring base linux-lts grub sudo
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
  echo "${hostname}" > /mnt/etc/hostname
 
