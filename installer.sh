@@ -38,7 +38,10 @@ password2=$(dialog --stdout --passwordbox "Enter admin password again" 0 0) || e
 clear
 [[ "$password" == "$password2" ]] || ( echo "Passwords did not match"; exit 1; )
 
-hidpi=$(dialog --stdout --inputbox "HIDPI Screen? (Y/N)" 0 0) || exit 1
+hidpi=$(dialog --stdout --inputbox "HIDPI Screen? (y/n)" 0 0) || exit 1
+clear
+
+minimal=$(dialog --stdout --inputbox "Minimal Install? (y/n) || exit 1
 clear
 
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
@@ -173,6 +176,13 @@ fi
 # Install some stuff. Note this installs the LTS kernel
 pacstrap /mnt linux-firmware dhcpcd diffutils inetutils logrotate lvm2 man-db man-pages mdadm nano netctl sysfsutils texinfo usbutils vi which wireless_tools wpa_supplicant iw dialog openssh exfat-utils zip unzip git polkit
 # arch-chroot /mnt systemctl enable dhcpcd
+
+if [[ "$minimal" =~ ^([yY])+$ ]]
+then
+	pacastrap /mnt base-devel xorg-server xorg-apps xorg-xinit ttf-dejavu autorandr tlp tp_smapi veracrypt rclone smartmontools tmux ppp\
+arandr xorg-xrandr light xterm i3-wm i3status i3lock dmenu xautolock pulseaudio thunderbird flameshot openfortivpn dunst\
+adwaita-icon-theme xorg-server-xephyr udiskie firefox alsa-utils pasystray pidgin python python-pip ruby tcl guile2.0 lua remmina freerdp
+fi
 
 # If Dual booting with Windows 10 under MBR
 # pacstrap /mmt os-prober 
