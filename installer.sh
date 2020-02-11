@@ -41,7 +41,7 @@ clear
 hidpi=$(dialog --stdout --inputbox "HIDPI Screen? (y/n)" 0 0) || exit 1
 clear
 
-minimal=$(dialog --stdout --inputbox "Minimal Install? (y/n) || exit 1
+minimal=$(dialog --stdout --inputbox "Minimal Install? (y/n)" 0 0) || exit 1
 clear
 
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
@@ -179,7 +179,7 @@ pacstrap /mnt linux-firmware dhcpcd diffutils inetutils logrotate lvm2 man-db ma
 
 if [[ "$minimal" =~ ^([yY])+$ ]]
 then
-	pacastrap /mnt base-devel xorg-server xorg-apps xorg-xinit ttf-dejavu autorandr tlp tp_smapi veracrypt rclone smartmontools tmux ppp\
+    pacastrap /mnt base-devel xorg-server xorg-apps xorg-xinit ttf-dejavu autorandr tlp tp_smapi veracrypt rclone smartmontools tmux ppp\
 arandr xorg-xrandr light xterm i3-wm i3status i3lock dmenu xautolock pulseaudio thunderbird flameshot openfortivpn dunst\
 adwaita-icon-theme xorg-server-xephyr udiskie firefox alsa-utils pasystray pidgin python python-pip ruby tcl guile2.0 lua remmina freerdp
 fi
