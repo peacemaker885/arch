@@ -52,7 +52,9 @@ curl -s "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
-#pacman -Sy --noconfirm pacman-contrib
+PACKAGES="base linux-lts grub sudo linux-firmware dhcpcd diffutils inetutils logrotate man-db man-pages \
+          vim netctl sysfsutils texinfo usbutils which wireless_tools wpa_supplicant iw dialog openssh \
+          exfat-utils zip unzip git polkit"
 
 ### Set up logging ###
 #exec 1> >(tee "stdout.log")
@@ -93,7 +95,7 @@ if [ -d /sys/firmware/efi ]; then
  mount "${part_boot}" /mnt/boot
  
  # Install basic system
- pacstrap /mnt base linux-lts grub sudo
+ pacstrap /mnt $PACKAGES
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
  # Install bootloader
@@ -141,7 +143,7 @@ else
  mount "${part_boot}" /mnt/boot
 
  # Install packages
- pacstrap /mnt base linux-lts grub sudo
+ pacstrap /mnt $PACKAGES
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
  echo "${hostname}" > /mnt/etc/hostname
 
@@ -171,7 +173,6 @@ then
 fi
 
 # Install some stuff. Note this installs the LTS kernel
-pacstrap /mnt linux-firmware dhcpcd diffutils inetutils logrotate man-db man-pages mdadm nano netctl sysfsutils texinfo usbutils vi which wireless_tools wpa_supplicant iw dialog openssh exfat-utils zip unzip git polkit
 # arch-chroot /mnt systemctl enable dhcpcd
 
 # If Dual booting with Windows 10 under MBR
