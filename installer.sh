@@ -52,7 +52,7 @@ curl -s "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
-pacman -Sy --noconfirm pacman-contrib
+#pacman -Sy --noconfirm pacman-contrib
 
 ### Set up logging ###
 #exec 1> >(tee "stdout.log")
