@@ -50,7 +50,7 @@ MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&
 echo "Updating mirror list"
 curl -s "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
-    rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
+    tee /etc/pacman.d/mirrorlist
 
 pacman -Sy --noconfirm pacman-contrib
 
