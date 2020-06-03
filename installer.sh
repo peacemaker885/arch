@@ -47,12 +47,12 @@ clear
 
 MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on"
 
-pacman -Sy --noconfirm pacman-contrib
-
 echo "Updating mirror list"
 curl -s "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
+
+pacman -Sy --noconfirm pacman-contrib
 
 ### Set up logging ###
 #exec 1> >(tee "stdout.log")
