@@ -184,3 +184,4 @@ fi
 
 echo "$user:$password" | arch-chroot /mnt chpasswd
 echo "root:$password" | arch-chroot /mnt chpasswd
+echo "Base install completed.  Please reboot and enjoy!"
