@@ -52,8 +52,8 @@ curl -s "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
-PACKAGES="base linux-lts grub sudo linux-firmware dhcpcd diffutils inetutils logrotate man-db man-pages \
-          vi netctl sysfsutils texinfo usbutils which wireless_tools wpa_supplicant iw dialog openssh \
+PACKAGES="base linux-lts sudo linux-firmware man-db man-pages \
+          vi netctl wireless_tools wpa_supplicant dialog openssh \
           exfat-utils zip unzip git polkit reflector"
 
 ### Set up logging ###
