@@ -52,7 +52,7 @@ curl -s "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
-PACKAGES="base linux-lts sudo linux-firmware man-db man-pages \
+PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
           vi netctl wireless_tools wpa_supplicant dialog openssh \
           exfat-utils zip unzip git polkit reflector"
 
