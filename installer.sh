@@ -172,8 +172,10 @@ then
     echo "FONT=latarcyrheb-sun32" | sudo tee /mnt/etc/vconsole.conf
 fi
 
-# Install some stuff. Note this installs the LTS kernel
-# arch-chroot /mnt systemctl enable dhcpcd
+# Enable networking
+arch-chroot /mnt systemctl enable iwd
+arch-chroot /mnt mkdir /etc/iwd
+arch-chroot /mnt echo -e "[General]\nEnableNetworkConfiguration=true" | tee /etc/iwd/main.conf
 
 # If Dual booting with Windows 10 under MBR
 # pacstrap /mmt os-prober 
