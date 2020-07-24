@@ -53,7 +53,7 @@ curl -s "$MIRRORLIST_URL" | \
     tee /etc/pacman.d/mirrorlist
 
 PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
-          vi netctl dhcpcd wireless_tools wpa_supplicant dialog openssh \
+          vi iwd wpa_supplicant dialog openssh \
           exfat-utils zip unzip git polkit reflector"
 
 ### Set up logging ###
@@ -175,7 +175,7 @@ fi
 # Enable networking
 arch-chroot /mnt systemctl enable iwd
 arch-chroot /mnt mkdir /etc/iwd
-arch-chroot /mnt echo -e "[General]\nEnableNetworkConfiguration=true" | tee /etc/iwd/main.conf
+echo -e "[General]\nEnableNetworkConfiguration=true" | tee /mnt/etc/iwd/main.conf
 
 # If Dual booting with Windows 10 under MBR
 # pacstrap /mmt os-prober 
