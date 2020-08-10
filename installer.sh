@@ -156,10 +156,10 @@ arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Pacific /etc/localtime
 arch-chroot /mnt hwclock --systohc
 
 # Make console more readable after install if HIDPI screen
-if [[ "$hidpi" =~ ^([yY])+$ ]]
-then
-    echo "FONT=latarcyrheb-sun32" | sudo tee /mnt/etc/vconsole.conf
-fi
+#if [[ "$hidpi" =~ ^([yY])+$ ]]
+#then
+#    echo "FONT=latarcyrheb-sun32" | sudo tee /mnt/etc/vconsole.conf
+#fi
 
 # Enable networking
 arch-chroot /mnt systemctl enable iwd
