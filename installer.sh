@@ -23,7 +23,6 @@ case $status in
 esac
 
 ### Get infomation from user ###
-exit
 read -p 'Hostname: ' hostname
 read -p 'Username: ' user
 read -sp 'Password: ' password
@@ -137,7 +136,7 @@ else
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
  echo "${hostname}" > /mnt/etc/hostname
 
- arch-chroot /mnt grub-install /dev/sda
+ arch-chroot /mnt grub-install $device
  arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 fi
