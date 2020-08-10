@@ -23,6 +23,7 @@ case $status in
 esac
 
 ### Get infomation from user ###
+exit
 read -p 'Hostname: ' hostname
 read -p 'Username: ' user
 read -sp 'Password: ' password
