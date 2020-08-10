@@ -23,27 +23,16 @@ case $status in
 esac
 
 ### Get infomation from user ###
-hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
-clear
-: ${hostname:?"hostname cannot be empty"}
-
-user=$(dialog --stdout --inputbox "Enter admin username" 0 0) || exit 1
-clear
-: ${user:?"user cannot be empty"}
-
-password=$(dialog --stdout --passwordbox "Enter admin password" 0 0) || exit 1
-clear
-: ${password:?"password cannot be empty"}
-password2=$(dialog --stdout --passwordbox "Enter admin password again" 0 0) || exit 1
-clear
+read -p "Hostname: " hostname
+read -p "Username: " user
+read -sp "Password: " password
+echo
+read -sp "repeat Password: " password2
 [[ "$password" == "$password2" ]] || ( echo "Passwords did not match"; exit 1; )
 
-hidpi=$(dialog --stdout --inputbox "HIDPI Screen? (y/n)" 0 0) || exit 1
-clear
-
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
-device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) || exit 1
-clear
+printf "$devicelist\n"
+read -p "Device to install in: " device
 
 MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on"
 
