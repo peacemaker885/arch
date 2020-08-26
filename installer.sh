@@ -42,7 +42,7 @@ curl -s "$MIRRORLIST_URL" | \
     tee /etc/pacman.d/mirrorlist
 
 PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
-          vi iwd wpa_supplicant dialog openssh \
+          vi iwd wpa_supplicant dialog openssh dhcpcd \
           exfat-utils zip unzip git polkit reflector"
 
 ### Set up logging ###
