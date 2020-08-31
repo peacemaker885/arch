@@ -31,7 +31,7 @@ read -sp 'repeat Password: ' password2
 [[ "$password" == "$password2" ]] || ( echo "Passwords did not match"; exit 1; )
 
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
-printf "$devicelist\n"
+printf "\n$devicelist\n"
 read -p "Device to install in: " device
 
 MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on"
