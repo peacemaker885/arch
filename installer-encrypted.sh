@@ -114,7 +114,7 @@ else
  # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1 
  # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
  part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
- part_enc="$(ls ${device}* | grep -E "^${device}p?3$")"
+ part_enc="$(ls ${device}* | grep -E "^${device}p?2$")"
 
  wipefs "${part_boot}"
  wipefs "${part_enc}"
