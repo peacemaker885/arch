@@ -41,9 +41,7 @@ curl -s "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
-PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
-          vi iwd wpa_supplicant dialog openssh dhcpcd \
-          exfat-utils zip unzip git polkit reflector"
+PACKAGES="base linux-lts grub "
 
 ### Set up logging ###
 #exec 1> >(tee "stdout.log")
@@ -134,12 +132,12 @@ else
  swapon /dev/mapper/vg0-swap
  mount /dev/mapper/vg0-root /mnt
  mkdir /mnt/boot
- mount "${part_boot}" /mnt/boot
+ mount ${part_boot} /mnt/boot
 
  # Install packages
  pacstrap /mnt $PACKAGES
- genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
- echo "${hostname}" > /mnt/etc/hostname
+ genfstab -pU /mnt >> /mnt/etc/fstab
+ echo ${hostname} > /mnt/etc/hostname
 
  arch-chroot /mnt grub-install $device
  arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
