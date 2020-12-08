@@ -120,7 +120,7 @@ else
  wipefs "${part_enc}"
 
  mkfs.ext4  "${part_boot}"
- cryptsetup -c aes-xts-plain64 -y --use-random luksFormat "${part_enc}"
+ cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_enc}
  cryptsetup luksOpen "${part_enc}" luks
 
  pvcreate /dev/mapper/luks
