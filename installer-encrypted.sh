@@ -119,10 +119,9 @@ else
  wipefs "${part_boot}"
  wipefs "${part_enc}"
 
- mkfs.ext4  "${part_boot}"
+ mkfs.ext4  ${part_boot}
  cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_enc}
- mkdir /run/cryptsetup
- cryptsetup luksOpen "${part_enc}" luks
+ cryptsetup luksOpen ${part_enc} luks
 
  pvcreate /dev/mapper/luks
  vgcreate vg0 /dev/mapper/luks
