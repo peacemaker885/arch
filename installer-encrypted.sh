@@ -121,6 +121,7 @@ else
 
  mkfs.ext4  "${part_boot}"
  cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_enc}
+ mkdir /run/cryptsetup
  cryptsetup luksOpen "${part_enc}" luks
 
  pvcreate /dev/mapper/luks
