@@ -128,7 +128,7 @@ else
  lvcreate --size ${swap_size} vg0 --name swap
  lvcreate -l +100%FREE vg0 --name root
 
- xmkfs.ext4 /dev/mapper/vg0-root
+ mkfs.ext4 /dev/mapper/vg0-root
  mkswap /dev/mapper/vg0-swap
 
  swapon /dev/mapper/vg0-swap
