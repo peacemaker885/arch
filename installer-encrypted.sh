@@ -109,7 +109,7 @@ else
  parted --script "${device}" -- mklabel msdos \
   mkpart primary ext4 1Mib 1GB \
   set 1 boot on \
-  mkpart primary ext4 100%
+  mkpart primary ext4 1GB 100%
 
  # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1 
  # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
