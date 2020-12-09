@@ -138,11 +138,12 @@ else
 
  # Install packages
  pacstrap /mnt $PACKAGES
- genfstab -pU /mnt >> /mnt/etc/fstab
+ genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
  echo ${hostname} > /mnt/etc/hostname
 
  arch-chroot /mnt grub-install $device
  arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+ arch-chroot /mnt sed -i GRUB_CMDLINE_LINUX=\"\"/GRUB_CMDLINE_LINUX=\"cryptdevice=\\/dev\\/${device}:luks:allow-discards\"/g /etc/default/grub
 
 fi
 
