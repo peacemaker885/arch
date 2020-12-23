@@ -37,7 +37,7 @@ read -p "Device to install in: " device
 MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on"
 
 echo "Updating mirror list"
-curl -s "$MIRRORLIST_URL" | \
+curl -sL "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
