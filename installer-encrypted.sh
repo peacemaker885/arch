@@ -161,6 +161,8 @@ arch-chroot /mnt sed -i s/\#en_US.UTF-8\ UTF-8/en_US.UTF-8\ UTF-8/g /etc/locale.
 arch-chroot /mnt locale-gen
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Pacific /etc/localtime
 arch-chroot /mnt hwclock --systohc
+echo -e "Add 'ext4' to MODULES\nAdd 'encrypt' and 'lvm2' to HOOKS before 'filesystems'\n" | tee /mnt/etc/mkinitcpio.conf
+arch-chroot /mnt mkinitcpio -p linux-lts
 
 # Make console more readable after install if HIDPI screen
 #if [[ "$hidpi" =~ ^([yY])+$ ]]
