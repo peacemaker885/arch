@@ -43,7 +43,7 @@ curl -sL "$MIRRORLIST_URL" | \
 
 PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
           vi iwd wpa_supplicant dialog openssh dhcpcd \
-          exfat-utils zip unzip git polkit reflector"
+          exfat-utils zip unzip git polkit reflector lvm2"
 
 ### Set up logging ###
 #exec 1> >(tee "stdout.log")
