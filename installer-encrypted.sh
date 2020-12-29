@@ -41,7 +41,7 @@ curl -sL "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
-PACKAGES="base bse-devel linux-lts grub sudo linux-firmware man-db man-pages \
+PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
           vi iwd wpa_supplicant dialog openssh dhcpcd \
           exfat-utils zip unzip git polkit reflector lvm2"
 
@@ -163,7 +163,7 @@ arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Pacific /etc/localtime
 arch-chroot /mnt hwclock --systohc
 MODULES_CMD="MODULES=(ext4)"
 sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
-HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)
+HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
 sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
 arch-chroot /mnt mkinitcpio -p linux-lts
 
