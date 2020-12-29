@@ -143,7 +143,7 @@ else
 
  arch-chroot /mnt grub-install $device
  arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
- GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_enc:luks:allow-discards\""
+ GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_enc:luks:allow-discards root=/dev/mapper/vg0-root\""
  arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
 
 fi
