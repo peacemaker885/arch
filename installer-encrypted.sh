@@ -138,7 +138,7 @@ else
 
  # Install packages
  pacstrap /mnt $PACKAGES
- genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
+ genfstab -pU /mnt >> /mnt/etc/fstab
  echo ${hostname} > /mnt/etc/hostname
 
  arch-chroot /mnt grub-install $device
@@ -161,7 +161,10 @@ arch-chroot /mnt sed -i s/\#en_US.UTF-8\ UTF-8/en_US.UTF-8\ UTF-8/g /etc/locale.
 arch-chroot /mnt locale-gen
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Pacific /etc/localtime
 arch-chroot /mnt hwclock --systohc
-echo -e "Add 'ext4' to MODULES\nAdd 'encrypt' and 'lvm2' to HOOKS before 'filesystems'\n" | tee /mnt/etc/mkinitcpio.conf
+MODULES_CMD="MODULES=(ext4)"
+sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
+HOOKS_CMD="HOOKS=(base udev autodetect modconf block encrypt lvm2 filesystems keyboard fsck)"
+sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
 arch-chroot /mnt mkinitcpio -p linux-lts
 
 # Make console more readable after install if HIDPI screen
