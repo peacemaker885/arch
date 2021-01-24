@@ -60,7 +60,7 @@ if [ -d /sys/firmware/efi ]; then
 
  parted --script "${device}" -- mklabel gpt \
   mkpart ESP fat32 1Mib 129MiB \
-  mkpart primary ext2 129Mib 329MiB
+  mkpart primary ext2 129Mib 329MiB \
   mkpart primary ext4 329MiB 100%
 
  # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
