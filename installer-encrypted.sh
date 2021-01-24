@@ -67,22 +67,31 @@ if [ -d /sys/firmware/efi ]; then
  # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
  # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
  part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
- part_swap="$(ls ${device}* | grep -E "^${device}p?2$")"
- part_root="$(ls ${device}* | grep -E "^${device}p?3$")"
+ part_root="$(ls ${device}* | grep -E "^${device}p?2$")"
 
  wipefs "${part_boot}"
- wipefs "${part_swap}"
  wipefs "${part_root}"
 
  mkfs.vfat -F32 "${part_boot}"
- mkswap "${part_swap}"
- mkfs.f2fs -f "${part_root}"
+ cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_root}
+ cryptsetup luksOpen ${part_root} luks
 
- swapon "${part_swap}"
- mount "${part_root}" /mnt
+ pvcreate /dev/mapper/luks
+ vgcreate vg0 /dev/mapper/luks
+ lvcreate --size ${swap_size} vg0 --name swap
+ lvcreate -l +100%FREE vg0 --name root
+
+ mkfs.ext4 /dev/mapper/vg0-root
+ mkswap /dev/mapper/vg0-swap
+
+ # Mount the new system 
+ mount /dev/mapper/vg0-root /mnt # /mnt is the installed system
+ swapon /dev/mapper/vg0-swap # Not needed but a good thing to test
  mkdir /mnt/boot
- mount "${part_boot}" /mnt/boot
- 
+ mount /dev/sdX2 /mnt/boot
+ mkdir /mnt/boot/efi
+ mount /dev/${part_boot} /mnt/boot/efi
+
  # Install basic system
  pacstrap /mnt $PACKAGES
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
