@@ -27,7 +27,7 @@ read -p 'Hostname: ' hostname
 read -p 'Username: ' user
 read -sp 'Password: ' password
 echo
-Read -sp 'repeat Password: ' password2
+read -sp 'repeat Password: ' password2
 [[ "$password" == "$password2" ]] || ( echo "Passwords did not match"; exit 1; )
 
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
