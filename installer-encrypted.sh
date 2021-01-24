@@ -27,7 +27,7 @@ read -p 'Hostname: ' hostname
 read -p 'Username: ' user
 read -sp 'Password: ' password
 echo
-read -sp 'repeat Password: ' password2
+Read -sp 'repeat Password: ' password2
 [[ "$password" == "$password2" ]] || ( echo "Passwords did not match"; exit 1; )
 
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
@@ -101,30 +101,11 @@ if [ -d /sys/firmware/efi ]; then
  # Install bootloader
  arch-chroot /mnt bootctl install
 
- # Configure mkinitcpio with modules needed for the initrd image
- #vim /etc/mkinitcpio.conf
- # Add 'ext4' to MODULES
- # Add 'encrypt' and 'lvm2' to HOOKS before filesystems
-
- # Regenerate initrd image
- mkinitcpio -p linux
- 
  # Setup grub
  arch-chroot /mnt grub-install $device
- GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_enc:luks:allow-discards\""
+ GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_root:luks:allow-discards\""
  arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
  arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg    
-
-cat <<EOF > /mnt/boot/loader/loader.conf
-default arch
-EOF
-
-cat <<EOF > /mnt/boot/loader/entries/arch.conf
-title    Arch Linux
-linux    /vmlinuz-linux-lts
-initrd   /initramfs-linux-lts.img
-options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
-EOF
 
 else
  # MBR
