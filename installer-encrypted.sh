@@ -60,18 +60,21 @@ if [ -d /sys/firmware/efi ]; then
 
  parted --script "${device}" -- mklabel gpt \
   mkpart ESP fat32 1Mib 129MiB \
-  set 1 boot on \
-  mkpart primary ext4 129MiB 100%
+  mkpart primary ext2 129Mib 329MiB
+  mkpart primary ext4 329MiB 100%
 
  # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
  # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
- part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
- part_root="$(ls ${device}* | grep -E "^${device}p?2$")"
+ part_efi="$(ls ${device}* | grep -E "^${device}p?1$")"
+ part_boot="$(ls ${device}* | grep -E "^${device}p?2$")"
+ part_root="$(ls ${device}* | grep -E "^${device}p?3$")"
 
+ wipefs "${part_efi}"
  wipefs "${part_boot}"
  wipefs "${part_root}"
 
- mkfs.vfat -F32 "${part_boot}"
+ mkfs.vfat -F32 "${part_efi}"
+ mkfs.ext2 "${part_boot}"
  cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_root}
  cryptsetup luksOpen ${part_root} luks
 
@@ -87,9 +90,9 @@ if [ -d /sys/firmware/efi ]; then
  mount /dev/mapper/vg0-root /mnt # /mnt is the installed system
  swapon /dev/mapper/vg0-swap # Not needed but a good thing to test
  mkdir /mnt/boot
- mount /dev/sdX2 /mnt/boot
+ mount /dev/${part_boot /mnt/boot
  mkdir /mnt/boot/efi
- mount /dev/${part_boot} /mnt/boot/efi
+ mount /dev/${part_efi} /mnt/boot/efi
 
  # Install basic system
  pacstrap /mnt $PACKAGES
