@@ -90,9 +90,9 @@ if [ -d /sys/firmware/efi ]; then
  mount /dev/mapper/vg0-root /mnt # /mnt is the installed system
  swapon /dev/mapper/vg0-swap # Not needed but a good thing to test
  mkdir /mnt/boot
- mount /dev/${part_boot} /mnt/boot
+ mount ${part_boot} /mnt/boot
  mkdir /mnt/boot/efi
- mount /dev/${part_efi} /mnt/boot/efi
+ mount ${part_efi} /mnt/boot/efi
 
  # Install basic system
  pacstrap /mnt $PACKAGES
