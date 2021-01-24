@@ -1,5 +1,6 @@
 #!/bin/bash
 # WARNING: this script will destroy data on the selected disk.
+# This script can be run by executing the following:
 
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -40,117 +41,19 @@ curl -sL "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
-PACKAGES="base linux-lts sudo linux-firmware man-db man-pages \
+PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
           vi iwd wpa_supplicant dialog openssh dhcpcd \
-          exfat-utils zip unzip git polkit reflector lvm2"
-
-### Set up logging ###
-#exec 1> >(tee "stdout.log")
-#exec 2> >(tee "stderr.log")
+          exfat-utils zip unzip git polkit reflector"
 
 timedatectl set-ntp true
-
-### Setup the disk and partitions ###
-echo Partitioning Disk
-# UEFI
-if [ -d /sys/firmware/efi ]; then
- swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
- swap_end=$(( $swap_size + 129 + 1 ))MiB
-
- parted --script "${device}" -- mklabel gpt \
-  mkpart ESP fat32 1Mib 129MiB \
-  mkpart primary ext2 129Mib 329MiB \
-  mkpart primary ext4 329MiB 100%
-
- # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
- # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
- part_efi="$(ls ${device}* | grep -E "^${device}p?1$")"
- part_boot="$(ls ${device}* | grep -E "^${device}p?2$")"
- part_root="$(ls ${device}* | grep -E "^${device}p?3$")"
-
- wipefs "${part_efi}"
- wipefs "${part_boot}"
- wipefs "${part_root}"
-
- mkfs.vfat -F32 "${part_efi}"
- mkfs.ext2 "${part_boot}"
- cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_root}
- cryptsetup luksOpen ${part_root} luks
-
- pvcreate /dev/mapper/luks
- vgcreate vg0 /dev/mapper/luks
- lvcreate --size ${swap_size} vg0 --name swap
- lvcreate -l +100%FREE vg0 --name root
-
- mkfs.ext4 /dev/mapper/vg0-root
- mkswap /dev/mapper/vg0-swap
-
- # Mount the new system 
- mount /dev/mapper/vg0-root /mnt # /mnt is the installed system
- swapon /dev/mapper/vg0-swap # Not needed but a good thing to test
- mkdir /mnt/boot
- mount ${part_boot} /mnt/boot
- mkdir /mnt/boot/efi
- mount ${part_efi} /mnt/boot/efi
-
- # Install basic system
- pacstrap /mnt $PACKAGES
- pacstrap /mnt grub-efi-x86_64 efibootmgr
- genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
-
- # Setup grub
- arch-chroot /mnt grub-install $device
- GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_root:luks:allow-discards\""
- arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
- arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg    
-
-else
- # MBR
- swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
- swap_end=$(( $swap_size + 129 + 1 ))MiB
-
- parted --script "${device}" -- mklabel msdos \
-  mkpart primary ext4 1Mib 1GB \
-  set 1 boot on \
-  mkpart primary ext4 1GB 100%
-
- # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1 
- # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
- part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
- part_enc="$(ls ${device}* | grep -E "^${device}p?2$")"
-
- wipefs "${part_boot}"
- wipefs "${part_enc}"
-
- mkfs.ext4  ${part_boot}
- cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_enc}
- cryptsetup luksOpen ${part_enc} luks
-
- pvcreate /dev/mapper/luks
- vgcreate vg0 /dev/mapper/luks
- lvcreate --size ${swap_size} vg0 --name swap
- lvcreate -l +100%FREE vg0 --name root
-
- mkfs.ext4 /dev/mapper/vg0-root
- mkswap /dev/mapper/vg0-swap
-
- swapon /dev/mapper/vg0-swap
- mount /dev/mapper/vg0-root /mnt
- mkdir /mnt/boot
- mount ${part_boot} /mnt/boot
-
- # Install packages
- pacstrap /mnt $PACKAGES
- pacstrap /mnt grub
- genfstab -pU /mnt >> /mnt/etc/fstab
- echo ${hostname} > /mnt/etc/hostname
-
- arch-chroot /mnt grub-install $device
- GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_enc:luks:allow-discards\""
- arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
- arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
-
-fi
+read -p "Is this a (r)egular install or (e)ncrypted install? (r/e): " type
+case $type in 
+	r)
+		func_standard
+	;;
+	e)
+		func_encrypted
+	;;
 
 # Hostname
 echo "${hostname}" > /mnt/etc/hostname
@@ -165,11 +68,6 @@ arch-chroot /mnt sed -i s/\#en_US.UTF-8\ UTF-8/en_US.UTF-8\ UTF-8/g /etc/locale.
 arch-chroot /mnt locale-gen
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Pacific /etc/localtime
 arch-chroot /mnt hwclock --systohc
-MODULES_CMD="MODULES=(ext4)"
-sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
-HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
-sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
-arch-chroot /mnt mkinitcpio -p linux-lts
 
 # Make console more readable after install if HIDPI screen
 #if [[ "$hidpi" =~ ^([yY])+$ ]]
@@ -192,3 +90,197 @@ echo -e "[General]\nEnableNetworkConfiguration=true" | tee /mnt/etc/iwd/main.con
 echo "$user:$password" | arch-chroot /mnt chpasswd
 echo "root:$password" | arch-chroot /mnt chpasswd
 echo "Base install completed.  Please reboot and enjoy!"
+
+func_standard () {
+	 ### Setup the disk and partitions ###
+	 echo Partitioning Disk
+	 # UEFI
+	 if [ -d /sys/firmware/efi ]; then
+ 	 	swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
+ 	 	swap_end=$(( $swap_size + 129 + 1 ))MiB
+
+ 	 parted --script "${device}" -- mklabel gpt \
+  	 	mkpart ESP fat32 1Mib 129MiB \
+  	 	set 1 boot on \
+  	 mkpart primary linux-swap 129MiB ${swap_end} \
+  	 mkpart primary ext4 ${swap_end} 100%
+
+ 	 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
+ 	 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
+ 	 part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
+ 	 part_swap="$(ls ${device}* | grep -E "^${device}p?2$")"
+ 	 part_root="$(ls ${device}* | grep -E "^${device}p?3$")"
+
+ 	 wipefs "${part_boot}"
+ 	 wipefs "${part_swap}"
+ 	 wipefs "${part_root}"
+
+	 mkfs.vfat -F32 "${part_boot}"
+	 mkswap "${part_swap}"
+	 mkfs.f2fs -f "${part_root}"
+
+	 swapon "${part_swap}"
+ 	 mount "${part_root}" /mnt
+	 mkdir /mnt/boot
+	 mount "${part_boot}" /mnt/boot
+	 
+	 # Install basic system
+	 pacstrap /mnt $PACKAGES
+	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
+
+	 # Install bootloader
+	 arch-chroot /mnt bootctl install
+
+cat <<EOF > /mnt/boot/loader/loader.conf
+default arch
+EOF
+
+cat <<EOF > /mnt/boot/loader/entries/arch.conf
+title    Arch Linux
+linux    /vmlinuz-linux-lts
+initrd   /initramfs-linux-lts.img
+options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
+EOF
+
+	else
+	 # MBR
+	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
+	 swap_end=$(( $swap_size + 129 + 1 ))MiB
+
+	 parted --script "${device}" -- mklabel msdos \
+	  mkpart primary ext4 1Mib 1GB \
+	  set 1 boot on \
+	  mkpart primary linux-swap 1GB ${swap_end} \
+	  mkpart primary ext4 ${swap_end} 100%
+
+	 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1 
+	 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
+	 part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
+	 part_swap="$(ls ${device}* | grep -E "^${device}p?2$")"
+	 part_root="$(ls ${device}* | grep -E "^${device}p?3$")"
+
+	 wipefs "${part_boot}"
+	 wipefs "${part_swap}"
+	 wipefs "${part_root}"
+
+	 mkfs.ext4  "${part_boot}"
+	 mkswap "${part_swap}"
+	 mkfs.ext4 "${part_root}"
+
+	 swapon "${part_swap}"
+	 mount "${part_root}" /mnt
+	 mkdir /mnt/boot
+	 mount "${part_boot}" /mnt/boot
+
+	 # Install packages
+	 pacstrap /mnt $PACKAGES
+	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
+	 echo "${hostname}" > /mnt/etc/hostname
+
+	 arch-chroot /mnt grub-install $device
+	 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+
+	fi
+
+func_encrypted () {
+	### Setup the disk and partitions ###     
+	echo Partitioning Disk                                     
+	# UEFI                                                                                                                
+	if [ -d /sys/firmware/efi ]; then                                                                                     
+	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')     
+	 swap_end=$(( $swap_size + 129 + 1 ))MiB
+
+	 parted --script "${device}" -- mklabel gpt \                                                                         
+	  mkpart ESP fat32 1Mib 129MiB \                                                                                      
+	  mkpart primary ext2 129Mib 329MiB \                   
+	  mkpart primary ext4 329MiB 100%                                                                                     
+								   
+	 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
+	 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
+	 part_efi="$(ls ${device}* | grep -E "^${device}p?1$")"    
+	 part_boot="$(ls ${device}* | grep -E "^${device}p?2$")"
+	 part_root="$(ls ${device}* | grep -E "^${device}p?3$")"                                                              
+								   
+	 wipefs "${part_efi}"                                      
+	 wipefs "${part_boot}"    
+	 wipefs "${part_root}"               
+								   
+	 mkfs.vfat -F32 "${part_efi}"         
+	 mkfs.ext2 "${part_boot}"                                  
+	 cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_root}
+	 cryptsetup luksOpen ${part_root} luks            
+								   
+	 pvcreate /dev/mapper/luks                              
+	 vgcreate vg0 /dev/mapper/luks  
+	 lvcreate --size ${swap_size} vg0 --name swap
+	 lvcreate -l +100%FREE vg0 --name root
+
+	 mkfs.ext4 /dev/mapper/vg0-root
+	 mkswap /dev/mapper/vg0-swap
+
+	 # Mount the new system 
+	 mount /dev/mapper/vg0-root /mnt # /mnt is the installed system
+	 swapon /dev/mapper/vg0-swap # Not needed but a good thing to test
+	 mkdir /mnt/boot
+	 mount ${part_boot} /mnt/boot
+	 mkdir /mnt/boot/efi
+	 mount ${part_efi} /mnt/boot/efi
+
+	 # Install basic system
+	 pacstrap /mnt $PACKAGES
+	 pacstrap /mnt grub-efi-x86_64 efibootmgr
+	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
+
+	 # Setup grub
+	 arch-chroot /mnt grub-install $device
+	 GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_root:luks:allow-discards\""
+	 arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
+	 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg    
+
+	else
+	 # MBR
+	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
+	 swap_end=$(( $swap_size + 129 + 1 ))MiB
+
+	 parted --script "${device}" -- mklabel msdos \
+	  mkpart primary ext4 1Mib 1GB \
+	  set 1 boot on \
+	  mkpart primary ext4 1GB 100%
+
+	 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1 
+	 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
+	 part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
+	 part_enc="$(ls ${device}* | grep -E "^${device}p?2$")"
+
+	 wipefs "${part_boot}"
+	 wipefs "${part_enc}"
+
+	 mkfs.ext4  ${part_boot}
+	 cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_enc}
+	 cryptsetup luksOpen ${part_enc} luks
+
+	 pvcreate /dev/mapper/luks
+	 vgcreate vg0 /dev/mapper/luks
+	 lvcreate --size ${swap_size} vg0 --name swap
+	 lvcreate -l +100%FREE vg0 --name root
+
+	 mkfs.ext4 /dev/mapper/vg0-root
+	 mkswap /dev/mapper/vg0-swap
+
+	 swapon /dev/mapper/vg0-swap
+	 mount /dev/mapper/vg0-root /mnt
+	 mkdir /mnt/boot
+	 mount ${part_boot} /mnt/boot
+
+	 # Install packages
+	 pacstrap /mnt $PACKAGES
+	 pacstrap /mnt grub
+	 genfstab -pU /mnt >> /mnt/etc/fstab
+	 echo ${hostname} > /mnt/etc/hostname
+
+	 arch-chroot /mnt grub-install $device
+	 GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_enc:luks:allow-discards\""
+	 arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
+	 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+
+	fi
