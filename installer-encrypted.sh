@@ -95,7 +95,7 @@ if [ -d /sys/firmware/efi ]; then
 
  # Install basic system
  pacstrap /mnt $PACKAGES
- pacstrap /mnt grub-efi efibootmgr
+ pacstrap /mnt grub-efi-x86_64 efibootmgr
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
  # Setup grub
