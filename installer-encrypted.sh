@@ -94,7 +94,8 @@ if [ -d /sys/firmware/efi ]; then
  mount ${part_efi} /mnt/boot/efi
 
  # Install basic system
- pacstrap /mnt $PACKAGES grub-efi efibootmgr
+ pacstrap /mnt $PACKAGES
+ pacstrap /mnt grub-efi efibootmgr
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
  # Setup grub
@@ -139,7 +140,8 @@ else
  mount ${part_boot} /mnt/boot
 
  # Install packages
- pacstrap /mnt $PACKAGES grub
+ pacstrap /mnt $PACKAGES
+ pacstrap /mnt grub
  genfstab -pU /mnt >> /mnt/etc/fstab
  echo ${hostname} > /mnt/etc/hostname
 
