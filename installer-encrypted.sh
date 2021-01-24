@@ -101,6 +101,20 @@ if [ -d /sys/firmware/efi ]; then
  # Install bootloader
  arch-chroot /mnt bootctl install
 
+ # Configure mkinitcpio with modules needed for the initrd image
+ #vim /etc/mkinitcpio.conf
+ # Add 'ext4' to MODULES
+ # Add 'encrypt' and 'lvm2' to HOOKS before filesystems
+
+ # Regenerate initrd image
+ mkinitcpio -p linux
+ 
+ # Setup grub
+ arch-chroot /mnt grub-install $device
+ GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_enc:luks:allow-discards\""
+ arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
+ arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg    
+
 cat <<EOF > /mnt/boot/loader/loader.conf
 default arch
 EOF
