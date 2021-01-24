@@ -53,6 +53,7 @@ case $type in
 	e)
 		func_encrypted
 	;;
+esac
 
 # Hostname
 echo "${hostname}" > /mnt/etc/hostname
