@@ -45,7 +45,6 @@ PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
           vi iwd wpa_supplicant dialog openssh dhcpcd \
           exfat-utils zip unzip git polkit reflector"
 
-timedatectl set-ntp true
 read -p "Is this a (r)egular install or (e)ncrypted install? (r/e): " type
 case $type in 
 	r)
