@@ -40,7 +40,7 @@ curl -sL "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
-PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
+PACKAGES="base linux-lts sudo linux-firmware man-db man-pages \
           vi iwd wpa_supplicant dialog openssh dhcpcd \
           exfat-utils zip unzip git polkit reflector lvm2"
 
@@ -94,11 +94,8 @@ if [ -d /sys/firmware/efi ]; then
  mount ${part_efi} /mnt/boot/efi
 
  # Install basic system
- pacstrap /mnt $PACKAGES
+ pacstrap /mnt $PACKAGES grub-efi efibootmgr
  genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
-
- # Install bootloader
- arch-chroot /mnt bootctl install
 
  # Setup grub
  arch-chroot /mnt grub-install $device
@@ -142,7 +139,7 @@ else
  mount ${part_boot} /mnt/boot
 
  # Install packages
- pacstrap /mnt $PACKAGES
+ pacstrap /mnt $PACKAGES grub
  genfstab -pU /mnt >> /mnt/etc/fstab
  echo ${hostname} > /mnt/etc/hostname
 
