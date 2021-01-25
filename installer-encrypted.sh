@@ -37,7 +37,7 @@ func_standard () {
 	 
 	 # Install basic system
 	 pacstrap /mnt $PACKAGES
- 	 pacstrap /mnt grub-efi-x86_64  efibootmgr lvm2
+ 	 pacstrap /mnt grub-efi-x86_64 efibootmgr
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
 	 # Install bootloader
@@ -251,6 +251,11 @@ case $type in
 	;;
 	e)
 		func_encrypted
+                MODULES_CMD="MODULES=(ext4)"
+		sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
+		HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
+		sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
+		arch-chroot /mnt mkinitcpio -p linux-lts
 	;;
 esac
 
@@ -267,11 +272,6 @@ arch-chroot /mnt sed -i s/\#en_US.UTF-8\ UTF-8/en_US.UTF-8\ UTF-8/g /etc/locale.
 arch-chroot /mnt locale-gen
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Pacific /etc/localtime
 arch-chroot /mnt hwclock --systohc
-MODULES_CMD="MODULES=(ext4)"
-sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
-HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
-sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
-arch-chroot /mnt mkinitcpio -p linux-lts
 
 # Make console more readable after install if HIDPI screen
 #if [[ "$hidpi" =~ ^([yY])+$ ]]
