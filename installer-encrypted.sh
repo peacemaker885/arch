@@ -133,8 +133,8 @@ func_encrypted () {
 	 mkswap /dev/mapper/vg0-swap
 
 	 # Mount the new system 
-	 mount /dev/mapper/vg0-root /mnt # /mnt is the installed system
-	 swapon /dev/mapper/vg0-swap # Not needed but a good thing to test
+	 mount /dev/mapper/vg0-root /mnt # 
+	 swapon /dev/mapper/vg0-swap 
 	 mkdir /mnt/boot
 	 mount ${part_boot} /mnt/boot
 	 mkdir /mnt/boot/efi
