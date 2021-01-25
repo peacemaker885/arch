@@ -101,7 +101,7 @@ func_encrypted () {
 	echo Partitioning Disk                                     
 	# UEFI                                                                                                                
 	if [ -d /sys/firmware/efi ]; then                                                                                     
- 	 read -n 1 -s -r -p "UEFI system found. Press any key to continue\n"
+ 	 read -n 1 -s -r -p "UEFI system found. Press any key to continue"
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}') 
 	 swap_end=$(( $swap_size + 129 + 1 ))MiB
 
@@ -141,6 +141,8 @@ func_encrypted () {
 	 mkdir /mnt/boot/efi
 	 mount ${part_efi} /mnt/boot/efi
 
+	 read -n 1 -s -r -p "Press any key to continue"
+
 	 # Install basic system
 	 pacstrap /mnt $PACKAGES
 	 pacstrap /mnt grub-efi-x86_64 efibootmgr lvm2
@@ -148,7 +150,7 @@ func_encrypted () {
 
 	else
 	 # MBR
-	 read -n 1 -s -r -p "BIOS system found.  Press any key to continue\n"
+	 #read -n 1 -s -r -p "BIOS system found.  Press any key to continue\n"
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
 	 swap_end=$(( $swap_size + 129 + 1 ))MiB
 
