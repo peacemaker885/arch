@@ -100,6 +100,7 @@ func_encrypted () {
 	### Setup the disk and partitions ###     
 	echo Partitioning Disk                                     
 	# UEFI                                                                                                                
+	read -n 1 -s -r -p "UEFI system found. Press any key to continue"
 	if [ -d /sys/firmware/efi ]; then                                                                                     
 	 printf "UEFI System found...\n"
 	 sleep 3
@@ -149,8 +150,7 @@ func_encrypted () {
 
 	else
 	 # MBR
-         printf "BIOS system found..."
-	 sleep 3
+	 read -n 1 -s -r -p "BIOS system found.  Press any key to continue"
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
 	 swap_end=$(( $swap_size + 129 + 1 ))MiB
 
@@ -191,6 +191,20 @@ func_encrypted () {
 	 echo ${hostname} > /mnt/etc/hostname
 
 	fi
+
+	read -n 1 -s -r -p "Processing GRUB..."
+	arch-chroot /mnt grub-install $device
+ 	GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_enc:luks:allow-discards\""
+ 	arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
+ 	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+
+	read -n 1 -s -r -p "Processing Modules..."
+	MODULES_CMD="MODULES=(ext4)"
+	sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
+	HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
+	sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
+	arch-chroot /mnt mkinitcpio -p linux-lts
+
 }
 
 set -uo pipefail
@@ -244,6 +258,7 @@ case $type in
 	;;
 	e)
 		func_encrypted
+		read -n 1 -s -r -p "Done with function..."
 	;;
 esac
 
