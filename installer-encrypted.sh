@@ -37,6 +37,7 @@ func_standard () {
 	 
 	 # Install basic system
 	 pacstrap /mnt $PACKAGES
+ 	 pacstrap /mnt grub-efi-x86_64  efibootmgr
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
 	 # Install bootloader
@@ -85,6 +86,7 @@ EOF
 
 	 # Install packages
 	 pacstrap /mnt $PACKAGES
+  	 pacstrap /mnt grub
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 	 echo "${hostname}" > /mnt/etc/hostname
 
@@ -237,7 +239,7 @@ curl -sL "$MIRRORLIST_URL" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     tee /etc/pacman.d/mirrorlist
 
-PACKAGES="base linux-lts grub sudo linux-firmware man-db man-pages \
+PACKAGES="base linux-lts sudo linux-firmware man-db man-pages \
           vi iwd wpa_supplicant dialog openssh dhcpcd \
           exfat-utils zip unzip git polkit reflector"
 
