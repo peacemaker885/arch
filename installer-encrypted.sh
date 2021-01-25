@@ -145,12 +145,6 @@ func_encrypted () {
 	 pacstrap /mnt grub-efi-x86_64 efibootmgr lvm2
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
-	 # Setup grub
-	 arch-chroot /mnt grub-install $device
-	 GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_root:luks:allow-discards\""
-	 arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
-	 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg    
-
 	else
 	 # MBR
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
@@ -191,11 +185,6 @@ func_encrypted () {
 	 pacstrap /mnt grub
 	 genfstab -pU /mnt >> /mnt/etc/fstab
 	 echo ${hostname} > /mnt/etc/hostname
-
-	 arch-chroot /mnt grub-install $device
-	 GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_enc:luks:allow-discards\""
-	 arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
-	 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 	fi
 }
@@ -251,6 +240,13 @@ case $type in
 	;;
 	e)
 		func_encrypted
+
+		# Setup grub
+         	arch-chroot /mnt grub-install $device
+         	GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_root:luks:allow-discards\""
+         	arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
+         	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg 
+
                 MODULES_CMD="MODULES=(ext4)"
 		sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
 		HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
