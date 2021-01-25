@@ -37,7 +37,7 @@ func_standard () {
 	 
 	 # Install basic system
 	 pacstrap /mnt $PACKAGES
- 	 pacstrap /mnt grub-efi-x86_64  efibootmgr
+ 	 pacstrap /mnt grub-efi-x86_64  efibootmgr lvm2
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
 	 # Install bootloader
@@ -142,7 +142,7 @@ func_encrypted () {
 
 	 # Install basic system
 	 pacstrap /mnt $PACKAGES
-	 pacstrap /mnt grub-efi-x86_64 efibootmgr
+	 pacstrap /mnt grub-efi-x86_64 efibootmgr lvm2
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
 	 # Setup grub
