@@ -258,7 +258,6 @@ case $type in
 	;;
 	e)
 		func_encrypted
-		read -n 1 -s -r -p "Done with function..."
 	;;
 esac
 
