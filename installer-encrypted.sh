@@ -100,11 +100,9 @@ func_encrypted () {
 	### Setup the disk and partitions ###     
 	echo Partitioning Disk                                     
 	# UEFI                                                                                                                
-	read -n 1 -s -r -p "UEFI system found. Press any key to continue"
 	if [ -d /sys/firmware/efi ]; then                                                                                     
-	 printf "UEFI System found...\n"
-	 sleep 3
-	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')     
+ 	 read -n 1 -s -r -p "UEFI system found. Press any key to continue\n"
+	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}') 
 	 swap_end=$(( $swap_size + 129 + 1 ))MiB
 
 	 parted --script "${device}" -- mklabel gpt \                                                                         
@@ -150,7 +148,7 @@ func_encrypted () {
 
 	else
 	 # MBR
-	 read -n 1 -s -r -p "BIOS system found.  Press any key to continue"
+	 read -n 1 -s -r -p "BIOS system found.  Press any key to continue\n"
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
 	 swap_end=$(( $swap_size + 129 + 1 ))MiB
 
