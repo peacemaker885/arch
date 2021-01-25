@@ -92,6 +92,7 @@ EOF
 	 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 	fi
+}
 
 func_encrypted () {
 	### Setup the disk and partitions ###     
@@ -195,6 +196,7 @@ func_encrypted () {
 	 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 	fi
+}
 
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -285,3 +287,4 @@ echo -e "[General]\nEnableNetworkConfiguration=true" | tee /mnt/etc/iwd/main.con
 echo "$user:$password" | arch-chroot /mnt chpasswd
 echo "root:$password" | arch-chroot /mnt chpasswd
 echo "Base install completed.  Please reboot and enjoy!"
+
