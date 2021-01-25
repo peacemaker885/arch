@@ -192,13 +192,13 @@ func_encrypted () {
 
 	fi
 
-	read -n 1 -s -r -p "Processing GRUB. Please press any key to continue..."
+	#read -n 1 -s -r -p "Processing GRUB. Please press any key to continue..."
 	arch-chroot /mnt grub-install $device
  	GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_root:luks:allow-discards\""
  	arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
  	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
-	read -n 1 -s -r -p "Processing Modules. Please press any key to continue..."
+	#read -n 1 -s -r -p "Processing Modules. Please press any key to continue..."
 	MODULES_CMD="MODULES=(ext4)"
 	sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
 	HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
