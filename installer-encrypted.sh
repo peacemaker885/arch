@@ -182,7 +182,7 @@ func_encrypted () {
 
 	 # Install packages
 	 pacstrap /mnt $PACKAGES
-	 pacstrap /mnt grub
+	 pacstrap /mnt grub lvm2
 	 genfstab -pU /mnt >> /mnt/etc/fstab
 	 echo ${hostname} > /mnt/etc/hostname
 
