@@ -101,6 +101,8 @@ func_encrypted () {
 	echo Partitioning Disk                                     
 	# UEFI                                                                                                                
 	if [ -d /sys/firmware/efi ]; then                                                                                     
+	 printf "UEFI System found...\n"
+	 sleep 3
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')     
 	 swap_end=$(( $swap_size + 129 + 1 ))MiB
 
@@ -147,6 +149,8 @@ func_encrypted () {
 
 	else
 	 # MBR
+         printf "BIOS system found..."
+	 sleep 3
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
 	 swap_end=$(( $swap_size + 129 + 1 ))MiB
 
@@ -240,17 +244,6 @@ case $type in
 	;;
 	e)
 		func_encrypted
- 		# Setup grub
-		arch-chroot /mnt grub-install $device
-		GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_root:luks:allow-discards\""
-		arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
-		arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg 
-
-		MODULES_CMD="MODULES=(ext4)"
-		sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
-		HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
-		sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
-		arch-chroot /mnt mkinitcpio -p linux-lts
 	;;
 esac
 
@@ -278,13 +271,6 @@ arch-chroot /mnt hwclock --systohc
 arch-chroot /mnt systemctl enable iwd
 arch-chroot /mnt mkdir /etc/iwd
 echo -e "[General]\nEnableNetworkConfiguration=true" | tee /mnt/etc/iwd/main.conf
-
-# If Dual booting with Windows 10 under MBR
-# pacstrap /mmt os-prober 
-# arch-chroot /mnt mkdir /mnt/windows
-# mount /dev/sda1 /mnt/windows
-# arch-chroot /mnt os-prober
-# arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 echo "$user:$password" | arch-chroot /mnt chpasswd
 echo "root:$password" | arch-chroot /mnt chpasswd
