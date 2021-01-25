@@ -57,7 +57,7 @@ EOF
 	else
 	 # MBR
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
-	 swap_end=$(( $swap_size + 129 + 1 ))MiB
+	 swap_end=$(( $swap_size + 130 + 1 ))MiB
 
 	 parted --script "${device}" -- mklabel msdos \
 	  mkpart primary ext4 1Mib 1GB \
@@ -162,14 +162,14 @@ func_encrypted () {
 	 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1 
 	 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
 	 part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
-	 part_enc="$(ls ${device}* | grep -E "^${device}p?2$")"
+	 part_root="$(ls ${device}* | grep -E "^${device}p?2$")"
 
 	 wipefs "${part_boot}"
-	 wipefs "${part_enc}"
+	 wipefs "${part_root}"
 
 	 mkfs.ext4  ${part_boot}
-	 cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_enc}
-	 cryptsetup luksOpen ${part_enc} luks
+	 cryptsetup -c aes-xts-plain64 -y --use-random luksFormat ${part_root}
+	 cryptsetup luksOpen ${part_root} luks
 
 	 pvcreate /dev/mapper/luks
 	 vgcreate vg0 /dev/mapper/luks
@@ -194,11 +194,11 @@ func_encrypted () {
 
 	read -n 1 -s -r -p "Processing GRUB. Please press any key to continue..."
 	arch-chroot /mnt grub-install $device
- 	GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_enc:luks:allow-discards\""
+ 	GRUB_CMD="GRUB_CMDLINE_LINUX=\"cryptdevice=$part_root:luks:allow-discards\""
  	arch-chroot /mnt sed -i "s|^GRUB_CMDLINE_LINUX=.*|$GRUB_CMD|" /etc/default/grub
  	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
-	read -n 1 -s -r -p "Processing Modules. Please press any key to continue...""
+	read -n 1 -s -r -p "Processing Modules. Please press any key to continue..."
 	MODULES_CMD="MODULES=(ext4)"
 	sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
 	HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
