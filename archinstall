@@ -2,20 +2,5 @@
     "!root-password": "<root_password>",
     "audio": null,
     "bootloader": "systemd-bootctl",
-    "filesystem": "ext4",
-    "kernels": [
-        "linux-lts"
-    ],
-    "keyboard-language": "us",
-    "mirror-region": {
-        "Worldwide": {
-            "https://mirror.rackspace.com/archlinux/$repo/os/$arch": true
-        }
-    },
-    "nic": {
-        "NetworkManager": true
-    },
-    "packages": [],
-    "profile": null,
     "timezone": "US/Pacific"
 }
