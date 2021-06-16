@@ -3,9 +3,6 @@
     "audio": null,
     "bootloader": "systemd-bootctl",
     "filesystem": "ext4",
-    "harddrive": {
-        "!path": "<path>"
-    },
     "kernels": [
         "linux-lts"
     ],
