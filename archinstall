@@ -2,9 +2,9 @@
     "!root-password": "<root_password>",
     "audio": null,
     "bootloader": "systemd-bootctl",
-    "filesystem": "btrfs",
-    "harddrive": {
-        "!path": "/dev/sda"
+    "filesystem": "ext4",
+    "!harddrive": {
+        "path": "/dev/sda"
     },
     "hostname": "box",
     "kernels": [
