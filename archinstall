@@ -4,7 +4,7 @@
     "bootloader": "systemd-bootctl",
     "filesystem": "btrfs",
     "harddrive": {
-        "path": "/dev/sda"
+        "!path": "/dev/sda"
     },
     "hostname": "box",
     "kernels": [
