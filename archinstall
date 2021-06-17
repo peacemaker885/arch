@@ -2,7 +2,7 @@
     "!root-password": "<root_password>",
     "audio": null,
     "bootloader": "systemd-bootctl",
-    "filesystem": "ext4",
+    "!filesystem": "ext4",
     "!harddrive": {
         "path": "/dev/sda"
     },
