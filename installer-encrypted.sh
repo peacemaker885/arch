@@ -239,12 +239,14 @@ devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 printf "\n$devicelist\n"
 read -p "Device to install in: " device
 
-MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on"
+reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
 
-echo "Updating mirror list"
-curl -sL "$MIRRORLIST_URL" | \
-    sed -e 's/^#Server/Server/' -e '/^#/d' | \
-    tee /etc/pacman.d/mirrorlist
+# MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on"
+
+# echo "Updating mirror list"
+# curl -sL "$MIRRORLIST_URL" | \
+#    sed -e 's/^#Server/Server/' -e '/^#/d' | \
+#    tee /etc/pacman.d/mirrorlist
 
 PACKAGES="base linux-lts sudo linux-firmware man-db man-pages \
           vi iwd wpa_supplicant dialog openssh dhcpcd \
