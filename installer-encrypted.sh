@@ -239,9 +239,8 @@ devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 printf "\n$devicelist\n"
 read -p "Device to install in: " device
 
-reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
-
-# MIRRORLIST_URL="https://www.archlinux.org/mirrorlist/?country=US&protocol=https&use_mirror_status=on"
+echo "Updating mirror list"
+reflector --verbose --country 'United States' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
 
 # echo "Updating mirror list"
 # curl -sL "$MIRRORLIST_URL" | \
