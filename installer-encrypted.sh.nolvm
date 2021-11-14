@@ -11,41 +11,30 @@ func_standard () {
  	 	swap_end=$(( $swap_size + 129 + 1 ))MiB
 
  	 parted --script "${device}" -- mklabel gpt \
- 	  mkpart ESP fat32 1Mib 129MiB \
-  	  set 1 boot on \
-  	  mkpart primary linux-swap 129MiB ${swap_end} \
-  	  mkpart primary ext4 ${swap_end} 100%
+  	 	mkpart ESP fat32 1Mib 129MiB \
+  	 	set 1 boot on \
+  	 mkpart primary linux-swap 129MiB ${swap_end} \
+  	 mkpart primary ext4 ${swap_end} 100%
 
  	 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
  	 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
-         part_efi="$(ls ${device}* | grep -E "^${device}p?1$")"    
-         part_boot="$(ls ${device}* | grep -E "^${device}p?2$")"
-         part_root="$(ls ${device}* | grep -E "^${device}p?3$")"  
+ 	 part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
+ 	 part_swap="$(ls ${device}* | grep -E "^${device}p?2$")"
+ 	 part_root="$(ls ${device}* | grep -E "^${device}p?3$")"
 
-         wipefs "${part_efi}"
  	 wipefs "${part_boot}"
+ 	 wipefs "${part_swap}"
  	 wipefs "${part_root}"
 
 	 mkfs.vfat -F32 "${part_boot}"
-         kfs.ext2 "${part_boot}" 
+	 mkswap "${part_swap}"
+	 mkfs.ext4 "${part_root}"
 
-         pvcreate "${part_root}"
-         vgcreate vg0 "${part_root}"
-         lvcreate --size ${swap_size} vg0 --name swap 
-         lvcreate -l +100%FREE vg0 --name root
-
-         mkswap /dev/vg0/swap
-         mkfs.ext4  /dev/vg0/root
-
-	 # Mount the new filesystem
-         swapon /dev/vg0/swap
-         mount /dev/vg0/root /mnt
-         mkdir /mnt/boot
-         mount "${part_boot}" /mnt/boot
-         mkdir /mnt/boot/efi
-         mount ${part_efi} /mnt/boot/efi
-
-
+	 swapon "${part_swap}"
+ 	 mount "${part_root}" /mnt
+	 mkdir /mnt/boot
+	 mount "${part_boot}" /mnt/boot
+	 
 	 # Install basic system
 	 pacstrap /mnt $PACKAGES
  	 pacstrap /mnt grub-efi-x86_64 efibootmgr
@@ -73,20 +62,28 @@ EOF
 	 parted --script "${device}" -- mklabel msdos \
 	  mkpart primary ext4 1Mib 1GB \
 	  set 1 boot on \
-          mkpart primary ext4 1GB 100%
+	  mkpart primary linux-swap 1GB ${swap_end} \
+	  mkpart primary ${swap_end} 100%
 
 	 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1 
 	 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
 	 part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
+	 #part_swap="$(ls ${device}* | grep -E "^${device}p?2$")"
+	 #part_root="$(ls ${device}* | grep -E "^${device}p?3$")"
 	 part_root="$(ls ${device}* | grep -E "^${device}p?2$")"
 
 	 wipefs "${part_boot}"
-	 wipefs "${part_root}"
+	 #wipefs "${part_swap}"
+	 #wipefs "${part_root}"
 
 	 pvcreate "${part_root}"
 	 vgcreate vg0 "${part_root}"
 	 lvcreate --size ${swap_size} vg0 --name swap 
          lvcreate -l +100%FREE vg0 --name root
+
+	 #mkfs.ext4  "${part_boot}"
+	 #mkswap "${part_swap}"
+	 #mkfs.ext4 "${part_root}"
 
          mkfs.ext4  "${part_boot}"
          mkswap /dev/vg0/swap
@@ -107,14 +104,6 @@ EOF
 	 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 	fi
-
-	#read -n 1 -s -r -p "Processing Modules. Please press any key to continue..."
-        MODULES_CMD="MODULES=(ext4)"
-        sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
-        HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block lvm2 filesystems fsck)"
-        sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
-        arch-chroot /mnt mkinitcpio -p linux-lts
-
 }
 
 func_encrypted () {
