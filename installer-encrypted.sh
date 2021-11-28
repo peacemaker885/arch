@@ -269,7 +269,7 @@ reflector --verbose --country 'United States' --latest 5 --sort rate --save /etc
 #    tee /etc/pacman.d/mirrorlist
 
 PACKAGES="base linux-lts sudo linux-firmware man-db man-pages \
-          vi iwd wpa_supplicant dialog openssh dhcpcd \
+          vi rsync iwd wpa_supplicant dialog openssh dhcpcd \
           exfat-utils zip unzip git polkit reflector"
 
 timedatectl set-ntp true
