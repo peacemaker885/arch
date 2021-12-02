@@ -1,9 +1,6 @@
 {
     "audio": null,
     "bootloader": "systemd-bootctl",
-    "harddrives": [
-        "/dev/loop0"
-    ],
     "hostname": "",
     "kernels": [
         "linux-lts"
