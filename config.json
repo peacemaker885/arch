@@ -2,6 +2,7 @@
     "audio": null,
     "bootloader": "systemd-bootctl",
     "hostname": "",
+    "filesystem: "ext4",
     "kernels": [
         "linux-lts"
     ],
@@ -10,10 +11,6 @@
         "Worldwide": {
             "https://mirror.rackspace.com/archlinux/$repo/os/$arch": true
         }
-    },
-    "nic": {
-        "NetworkManager": true,
-        "nic": "Use NetworkManager (necessary to configure internet graphically in GNOME and KDE)"
     },
     "ntp": true,
     "packages": [],
