@@ -2,7 +2,7 @@
     "audio": null,
     "bootloader": "systemd-bootctl",
     "hostname": "",
-    "filesystem: "ext4",
+    "filesystem": "ext4",
     "kernels": [
         "linux-lts"
     ],
