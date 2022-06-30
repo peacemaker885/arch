@@ -106,14 +106,11 @@
         }
     },
     "mount_point": null,
-    "nic": {
-        "dhcp": true,
-        "dns": null,
-        "gateway": null,
-        "iface": null,
-        "ip": null,
-        "type": "iso"
-    },
+    "packages": [
+        "vi",
+        "dialog",
+        "git"
+    ],
     "plugin": null,
     "profile": {
         "path": "/usr/lib/python3.10/site-packages/archinstall/profiles/minimal.py"

@@ -51,20 +51,6 @@ func_standard () {
  	 pacstrap /mnt grub-efi-x86_64 efibootmgr
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
-	 # Install bootloader
-	 arch-chroot /mnt bootctl install
-
-cat <<EOF > /mnt/boot/loader/loader.conf
-default arch
-EOF
-
-cat <<EOF > /mnt/boot/loader/entries/arch.conf
-title    Arch Linux
-linux    /vmlinuz-linux-lts
-initrd   /initramfs-linux-lts.img
-options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
-EOF
-
 	else
 	 # MBR
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
