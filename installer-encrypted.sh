@@ -89,10 +89,11 @@ func_standard () {
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 	 echo "${hostname}" > /mnt/etc/hostname
 
-	 arch-chroot /mnt grub-install $device
-	 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
-
 	fi
+
+	# install grub
+        arch-chroot /mnt grub-install $device
+        arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 	#read -n 1 -s -r -p "Processing Modules. Please press any key to continue..."
         MODULES_CMD="MODULES=(ext4)"
