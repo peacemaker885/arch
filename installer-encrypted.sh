@@ -53,6 +53,7 @@ func_standard () {
 
          # Install bootloader
          arch-chroot /mnt bootctl --path=/boot install
+         mkdir -p /mnt/boot/loader/entries
 
 cat <<EOF > /mnt/boot/loader/loader.conf
 default arch
