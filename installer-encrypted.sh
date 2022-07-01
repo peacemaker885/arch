@@ -11,10 +11,9 @@ func_standard () {
  	 	swap_end=$(( $swap_size + 129 + 1 ))MiB
 
  	 parted --script "${device}" -- mklabel gpt \
- 	  mkpart ESP fat32 1Mib 129MiB \
-  	  set 1 boot on \
-  	  mkpart primary linux-swap 129MiB ${swap_end} \
-  	  mkpart primary ext4 ${swap_end} 100%
+	  mkpart ESP fat32 1Mib 129MiB \
+          mkpart primary ext2 129Mib 329MiB \
+          mkpart primary ext4 329MiB 100% 
 
  	 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
  	 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
