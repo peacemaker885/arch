@@ -26,8 +26,8 @@ func_standard () {
  	 wipefs "${part_boot}"
  	 wipefs "${part_root}"
 
-	 mkfs.vfat -F32 "${part_boot}"
-         kfs.ext2 "${part_boot}" 
+	 mkfs.vfat -F32 "${part_efi}"
+         mkfs.ext2 "${part_boot}" 
 
          pvcreate "${part_root}"
          vgcreate vg0 "${part_root}"
