@@ -51,6 +51,20 @@ func_standard () {
  	 pacstrap /mnt grub-efi-x86_64 efibootmgr lvm2
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 
+         # Install bootloader
+         arch-chroot /mnt bootctl --path=/boot install
+
+cat <<EOF > /mnt/boot/loader/loader.conf
+default arch
+EOF
+
+cat <<EOF > /mnt/boot/loader/entries/arch.conf
+title    Arch Linux
+linux    /vmlinuz-linux-lts
+initrd   /initramfs-linux-lts.img
+options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
+EOF
+
 	else
 	 # MBR
 	 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
@@ -87,20 +101,21 @@ func_standard () {
 	 pacstrap /mnt $PACKAGES
   	 pacstrap /mnt grub lvm2
 	 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
-	 echo "${hostname}" > /mnt/etc/hostname
 
-	fi
+	 # install grub
+         arch-chroot /mnt grub-install $device
+         arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
-	# install grub
-        arch-chroot /mnt grub-install $device
-        arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
-
-	#read -n 1 -s -r -p "Processing Modules. Please press any key to continue..."
-        MODULES_CMD="MODULES=(ext4)"
-        sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
-        HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block lvm2 filesystems fsck)"
-        sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
-        arch-chroot /mnt mkinitcpio -p linux-lts
+	 #read -n 1 -s -r -p "Processing Modules. Please press any key to continue..."
+         MODULES_CMD="MODULES=(ext4)"
+         sed -i "s|^MODULES=.*|$MODULES_CMD|" /mnt/etc/mkinitcpio.conf
+         HOOKS_CMD="HOOKS=(base udev autodetect keyboard keymap consolefont modconf block lvm2 filesystems fsck)"
+         sed -i "s|HOOKS=.*|$HOOKS_CMD|" /mnt/etc/mkinitcpio.conf
+         arch-chroot /mnt mkinitcpio -p linux-lts
+ 
+        fi
+     
+        echo "${hostname}" > /mnt/etc/hostname
 
 }
 
