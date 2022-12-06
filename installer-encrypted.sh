@@ -280,7 +280,7 @@ arch-chroot /mnt useradd -m $user -G wheel -s /bin/bash
 # Settings
 echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
 arch-chroot /mnt sed -i s/\#en_US.UTF-8\ UTF-8/en_US.UTF-8\ UTF-8/g /etc/locale.gen
-arch-chroot /mnt sed -i s/\#\ \%wheel\ ALL=\(ALL:ALL\)\ ALL/\%wheel\ ALL=\(ALL:ALL\)\ ALL/g /tmp/sudoers 
+arch-chroot /mnt sed -i s/\#\ \%wheel\ ALL=\(ALL:ALL\)\ ALL/\%wheel\ ALL=\(ALL:ALL\)\ ALL/g /etc/sudoers 
 arch-chroot /mnt locale-gen
 arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Pacific /etc/localtime
 arch-chroot /mnt hwclock --systohc
