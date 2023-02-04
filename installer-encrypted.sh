@@ -256,7 +256,7 @@ reflector --verbose --country 'United States' --latest 5 --sort rate --save /etc
 #    tee /etc/pacman.d/mirrorlist
 
 PACKAGES="base linux-lts sudo linux-firmware man-db man-pages \
-          vi rsync networkmanager dialog openssh dhcpcd \
+          vi rsync iwd dialog openssh dhcpcd \
           exfat-utils zip unzip git polkit reflector inetutils bind-tools"
 
 timedatectl set-ntp true
@@ -291,9 +291,9 @@ arch-chroot /mnt hwclock --systohc
 #fi
 
 # Enable networking
-arch-chroot /mnt systemctl enable networkmanager
-# arch-chroot /mnt mkdir /etc/iwd
-# echo -e "[General]\nEnableNetworkConfiguration=true" | tee /mnt/etc/iwd/main.conf
+arch-chroot /mnt systemctl enable iwd
+arch-chroot /mnt mkdir /etc/iwd
+echo -e "[General]\nEnableNetworkConfiguration=true" | tee /mnt/etc/iwd/main.conf
 
 echo "$user:$password" | arch-chroot /mnt chpasswd
 echo "root:$password" | arch-chroot /mnt chpasswd
