@@ -290,12 +290,16 @@ arch-chroot /mnt hwclock --systohc
 #    echo "FONT=latarcyrheb-sun32" | sudo tee /mnt/etc/vconsole.conf
 #fi
 
-# Enable networking
-arch-chroot /mnt systemctl enable iwd
-arch-chroot /mnt mkdir /etc/iwd
-echo -e "[General]\nEnableNetworkConfiguration=true" | tee /mnt/etc/iwd/main.conf
-
+# Set passwords
 echo "$user:$password" | arch-chroot /mnt chpasswd
 echo "root:$password" | arch-chroot /mnt chpasswd
+
+# Enable networking
+#arch-chroot /mnt systemctl enable iwd
+#arch-chroot /mnt mkdir /etc/iwd
+#echo -e "[General]\nEnableNetworkConfiguration=true" | tee /mnt/etc/iwd/main.conf
+arch-chroot /mnt systemctl enable NetworkManager
+
+# Done
 echo "Base install completed.  Please reboot and enjoy!"
 
