@@ -294,10 +294,8 @@ arch-chroot /mnt hwclock --systohc
 echo "$user:$password" | arch-chroot /mnt chpasswd
 echo "root:$password" | arch-chroot /mnt chpasswd
 
-# Enable networking
-#arch-chroot /mnt systemctl enable iwd
-#arch-chroot /mnt mkdir /etc/iwd
-#echo -e "[General]\nEnableNetworkConfiguration=true" | tee /mnt/etc/iwd/main.conf
+# Enable services
+arch-chroot /mnt systemctl enable sddm
 arch-chroot /mnt systemctl enable iwd
 arch-chroot /mnt systemctl enable dhcpcd
 
