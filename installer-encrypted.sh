@@ -256,7 +256,7 @@ reflector --verbose --country 'United States' --latest 5 --sort rate --save /etc
 #    tee /etc/pacman.d/mirrorlist
 
 PACKAGES="base base-devel linux-lts sudo linux-firmware man-db man-pages \
-          vim rsync iwd dialog openssh dhcpcd \
+          vim rsync iwd dialog openssh dhcpcd plasma-meta sddm \
           exfat-utils zip unzip git polkit reflector inetutils bind-tools"
 
 timedatectl set-ntp true

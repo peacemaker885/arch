@@ -2,9 +2,14 @@ Encrypted
 
 cryptsetup open /dev/device padede
 vgscan
-mount /dev/vg0 /mnt
+vgchange -a y vg0
+mount /dev/mapper/vg0-root /mnt
+mount /dev/nvme0n1p2 /mnt/boot
+mount /dev/nvme0n1p1 /mnt/boot/efi
 arch-chroot /mnt
 
+umount /mnt/boot/efi
+umount /mnt/boot
 umount /mnt
 vgchange -a n
 cryptsetup close padede
